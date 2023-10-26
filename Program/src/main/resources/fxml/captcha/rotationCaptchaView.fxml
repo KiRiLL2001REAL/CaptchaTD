@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="anchorPane" prefHeight="500.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="cw.controllers.RotationCaptchaController">
+    <Button fx:id="checkButton" layoutX="361.0" layoutY="459.0" mnemonicParsing="false" text="Проверить">
+        <font>
+            <Font name="Calibri" size="16.0"/>
+        </font>
+    </Button>
+    <Label fx:id="flagLabel" layoutX="467.0" layoutY="464.0" prefHeight="18.0" prefWidth="119.0" text="---"
+           textAlignment="CENTER">
+        <font>
+            <Font name="Calibri" size="18.0"/>
+        </font>
+    </Label>
+    <Slider fx:id="rotationSlider" layoutX="559.0" layoutY="37.0" max="360.0" orientation="VERTICAL" prefHeight="401.0"
+            prefWidth="14.0"/>
+    <ImageView fx:id="patternView" fitHeight="150.0" fitWidth="150.0" layoutX="80.0" layoutY="162.0" pickOnBounds="true"
+               preserveRatio="true"/>
+    <ImageView fx:id="rotatableView" fitHeight="150.0" fitWidth="150.0" layoutX="361.0" layoutY="162.0"
+               pickOnBounds="true" preserveRatio="true"/>
+    <Button fx:id="refreshButton" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" text="Обновить">
+        <font>
+            <Font name="Calibri" size="12.0"/>
+        </font>
+    </Button>
+    <Label fx:id="hintPatternLabel" layoutX="90.0" layoutY="120.0" text="Статичный шаблон">
+        <font>
+            <Font name="Calibri" size="16.0"/>
+        </font>
+    </Label>
+    <Label fx:id="hintRotatableLabel" layoutX="321.0" layoutY="120.0" text="Вращаемое изображение">
+        <font>
+            <Font name="Calibri" size="16.0"/>
+        </font>
+    </Label>
+</AnchorPane>
