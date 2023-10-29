@@ -102,13 +102,11 @@ public class ImageTextUtils {
             var h = wRotated.getHeight();
             var cX = (int)(w / 2d);
             var cY = (int)(h / 2d);
-            { // fill with white color
-                Color color = Color.WHITE;
-                for (int ii = 0; ii < h; ii++)
-                    for (int jj = 0; jj < w; jj++)
-                        rW.setColor(jj, ii, color);
-            }
-            // rotate image
+            // fill with white color
+            for (int ii = 0; ii < h; ii++)
+                for (int jj = 0; jj < w; jj++)
+                    rW.setColor(jj, ii, Color.WHITE);
+            // rotating an image
             double deviatedAngle = AdditionalMath.mapValue(
                     Math.random(), 0, 1, -maxDeviationAngle, maxDeviationAngle);
             for (int ii = 0; ii < h; ii++)

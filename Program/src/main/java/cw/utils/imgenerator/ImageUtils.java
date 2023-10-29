@@ -1,15 +1,11 @@
 package cw.utils.imgenerator;
 
-import javafx.scene.SnapshotParameters;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 
 import java.util.Random;
 
@@ -53,11 +49,13 @@ public class ImageUtils {
         pixels[0] = pr.getColor(bottomRightX - 1, bottomRightY - 1);
         if (bottomRightX < imageWidth)
             pixels[1] = pr.getColor(bottomRightX, bottomRightY - 1);
-        else pixels[1] = pixels[0];
+        else
+            pixels[1] = pixels[0];
 
         if (bottomRightY < imageHeight)
             pixels[3] = pr.getColor(bottomRightX - 1, bottomRightY);
-        else pixels[3] = pixels[0];
+        else
+            pixels[3] = pixels[0];
 
         if (bottomRightX < imageWidth)
             if (bottomRightY < imageHeight)
@@ -130,46 +128,6 @@ public class ImageUtils {
         }
 
         return wImage;
-    }
-
-    /**
-     * Make {@link WritableImage} array of chars from String {@code expr}.
-     * <p><b>WARNING</b> the {@code '\n'} character producing {@code null} {@link WritableImage},
-     * so you need to manually handle the line feed.
-     * @param expr string to convert.
-     * @param fontName name of font.
-     * @param fontSize size of font.
-     */
-    public static WritableImage[] rasterizeTextByLetters(String expr, String fontName, int fontSize) {
-        Font font = new Font(fontName, fontSize);
-        Text text;
-
-        int size = expr.length();
-        WritableImage[] result = new WritableImage[size];
-        for (int i = 0; i < size; i++) {
-            char c = expr.charAt(i);
-            if (c == '\n') {
-                result[i] = null;
-                continue;
-            }
-
-            text = new Text(String.valueOf(c));
-            text.setFont(font);
-            double tWidth = text.getLayoutBounds().getWidth();
-            double tHeight = text.getLayoutBounds().getHeight();
-            double tOffsetY = text.getBaselineOffset();
-
-            Canvas canvas = new Canvas((int)tWidth, (int)tHeight);
-            GraphicsContext gContext = canvas.getGraphicsContext2D();
-            gContext.setFill(Color.BLACK);
-            gContext.setFont(font);
-            gContext.fillText(String.valueOf(c), 0, tOffsetY);
-
-            result[i] = new WritableImage((int)tWidth, (int)tHeight);
-            canvas.snapshot(new SnapshotParameters(), result[i]);
-        }
-
-        return result;
     }
 
     public enum PrimitiveType {
@@ -253,9 +211,9 @@ public class ImageUtils {
         float b = (float)mapValue((c >>> 16) & 255, 0, 255,
                 MIN_COLOR_FACTOR, MAX_COLOR_FACTOR);
         if (hasTransparency) {
-            float o = (float) mapValue((c >>> 24) & 255, 0, 255,
+            float opacity = (float) mapValue((c >>> 24) & 255, 0, 255,
                     0, 1);
-            return new Color(r, g, b, o);
+            return new Color(r, g, b, opacity);
         }
 
         return new Color(r, g, b, 1);

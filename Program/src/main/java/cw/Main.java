@@ -1,6 +1,5 @@
 package cw;
 
-import cw.utils.HelpConfiguration;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -26,7 +25,6 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
-        HelpConfiguration hc = new HelpConfiguration("/help/config/mathCaptchaHelp.ini");
         launch();
     }
 }
