@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AdditionalMathTest {
     @Test
-    void mapValueTest() {
+    void testMapValue() {
         double value = 1;
         double srcFrom = 0;
         double srcTo = 4;
@@ -17,7 +17,7 @@ class AdditionalMathTest {
     }
 
     @Test
-    void euclideanDistance2DTest() {
+    void testEuclideanDistance2D() {
         double[] point1 = {0, 0};
         double[] point2 = {1, 2};
         double actual = AdditionalMath.euclideanDistance(point1, point2);
@@ -25,7 +25,7 @@ class AdditionalMathTest {
     }
 
     @Test
-    void euclideanDistance3DTest() {
+    void testEuclideanDistance3D() {
         double[] point1 = {1, 2, 3};
         double[] point2 = {0, 0, 0};
         double actual = AdditionalMath.euclideanDistance(point1, point2);
