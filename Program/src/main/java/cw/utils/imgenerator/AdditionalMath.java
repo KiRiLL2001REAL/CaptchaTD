@@ -30,35 +30,8 @@ public class AdditionalMath {
         return Math.sqrt(quadraticSum);
     }
 
-    public static double sqr(double arg) {
+    protected static double sqr(double arg) {
         return arg * arg;
-    }
-
-    /**
-     * Length of the vector.
-     * @param v representation of the first point as a {@code double[]}.
-     * @return the length of the specified vector.
-     */
-    public static double length(double[] v) {
-        int dimensions = v.length;
-        double quadraticSum = 0d;
-        for (double value : v)
-            quadraticSum += sqr(value);
-        return Math.pow(quadraticSum, 1.d / dimensions);
-    }
-
-    /**
-     * Normalize the vector.
-     * @param vector the vector to be normalized.
-     * @return normalized vector of the specified dimension.
-     */
-    public static double[] normalize(double[] vector) {
-        double length = length(vector);
-        double k = 1d / length;
-        var v = new double[vector.length];
-        for (int i = 0; i < vector.length; i++)
-            v[i] = vector[i] * k;
-        return v;
     }
 
     /**
