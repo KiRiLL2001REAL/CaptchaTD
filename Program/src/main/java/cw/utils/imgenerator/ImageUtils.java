@@ -206,12 +206,12 @@ public class ImageUtils {
         int c = rng.nextInt();
         float r = (float)mapValue(c & 255, 0, 255,
                 MIN_COLOR_FACTOR, MAX_COLOR_FACTOR);
-        float g = (float)mapValue((c >>> 8) & 255, 0, 255,
+        float g = (float)mapValue((c >> 8) & 255, 0, 255,
                 MIN_COLOR_FACTOR, MAX_COLOR_FACTOR);
-        float b = (float)mapValue((c >>> 16) & 255, 0, 255,
+        float b = (float)mapValue((c >> 16) & 255, 0, 255,
                 MIN_COLOR_FACTOR, MAX_COLOR_FACTOR);
         if (hasTransparency) {
-            float opacity = (float) mapValue((c >>> 24) & 255, 0, 255,
+            float opacity = (float) mapValue((c >> 24) & 255, 0, 255,
                     0, 1);
             return new Color(r, g, b, opacity);
         }
@@ -232,19 +232,10 @@ public class ImageUtils {
     public static Color mix(Color A, Color B, double factor) {
         double factor_inv = 1.d - factor;
 
-        int rgbaA = A.hashCode();
-        int rgbaB = B.hashCode();
-        int rA = (rgbaA >> 24) & 0xFF;
-        int gA = (rgbaA >> 16) & 0xFF;
-        int bA = (rgbaA >> 8 ) & 0xFF;
-        int rB = (rgbaB >> 24) & 0xFF;
-        int gB = (rgbaB >> 16) & 0xFF;
-        int bB = (rgbaB >> 8 ) & 0xFF;
+        double rC = A.getRed()   * factor_inv + B.getRed()   * factor;
+        double gC = A.getGreen() * factor_inv + B.getGreen() * factor;
+        double bC = A.getBlue()  * factor_inv + B.getBlue()  * factor;
 
-        int rC = (int)((double)(rA) * factor_inv + (double)(rB) * factor);
-        int gC = (int)((double)(gA) * factor_inv + (double)(gB) * factor);
-        int bC = (int)((double)(bA) * factor_inv + (double)(bB) * factor);
-
-        return Color.rgb(rC,gC,bC,1);
+        return new Color(rC, gC, bC,1);
     }
 }
