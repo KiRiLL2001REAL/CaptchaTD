@@ -1,5 +1,7 @@
 package cw.utils;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -12,6 +14,14 @@ public class HelpConfiguration {
     ArrayList<Integer> stringsIndices;
     ArrayList<String> images;
     ArrayList<Integer> imagesIndices;
+
+    public HelpConfiguration() {
+        this.title = "";
+        this.strings = new ArrayList<>();
+        this.stringsIndices = new ArrayList<>();
+        this.images = new ArrayList<>();
+        this.imagesIndices = new ArrayList<>();
+    }
 
     public HelpConfiguration(
             String title,
@@ -27,10 +37,14 @@ public class HelpConfiguration {
         this.imagesIndices = imagesIndices;
     }
 
-    public HelpConfiguration(
-            String iniFile
-    ) {
-        try (InputStream is = getClass().getResourceAsStream(iniFile)) {
+    public void loadFromFile(
+            String iniFilePath
+    ) throws Exception {
+        InputStream is = null;
+        try {
+            if (iniFilePath.startsWith("/")) is = getClass().getResourceAsStream(iniFilePath);
+            else is = new FileInputStream(iniFilePath);
+
             String[] strIndices;
 
             Wini ini = new Wini(is);
@@ -57,14 +71,16 @@ public class HelpConfiguration {
                     content = content.replace("\\n", "\n");
                     content = content.replace("\\t", "\t");
                     this.strings.add(content);
-                }
-                else if (this.imagesIndices.contains(i))
+                } else if (this.imagesIndices.contains(i))
                     this.images.add(content);
                 else
                     throw new IOException("Incorrect element enumeration: id " + i + " is not found.");
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (is != null)
+                is.close();
         }
     }
 

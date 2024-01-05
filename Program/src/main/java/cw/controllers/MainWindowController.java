@@ -183,22 +183,34 @@ public class MainWindowController {
 
     @FXML
     void openHelpText() {
-        openHelpWindow(new HelpConfiguration("/help/config/textCaptchaHelp.ini"));
+        var helpConf = new HelpConfiguration();
+        try { helpConf.loadFromFile("/help/config/textCaptchaHelp.ini"); }
+        catch (Exception e) { e.printStackTrace(); }
+        openHelpWindow(helpConf);
     }
 
     @FXML
     void openHelpMath() {
-        openHelpWindow(new HelpConfiguration("/help/config/mathCaptchaHelp.ini"));
-    }
-
-    @FXML
-    void openHelpPuzzle() {
-        openHelpWindow(new HelpConfiguration("/help/config/puzzleCaptchaHelp.ini"));
+        var helpConf = new HelpConfiguration();
+        try { helpConf.loadFromFile("/help/config/mathCaptchaHelp.ini"); }
+        catch (Exception e) { e.printStackTrace(); }
+        openHelpWindow(helpConf);
     }
 
     @FXML
     void openHelpRotation() {
-        openHelpWindow(new HelpConfiguration("/help/config/rotationCaptchaHelp.ini"));
+        var helpConf = new HelpConfiguration();
+        try { helpConf.loadFromFile("/help/config/rotationCaptchaHelp.ini"); }
+        catch (Exception e) { e.printStackTrace(); }
+        openHelpWindow(helpConf);
+    }
+
+    @FXML
+    void openHelpPuzzle() {
+        var helpConf = new HelpConfiguration();
+        try { helpConf.loadFromFile("/help/config/puzzleCaptchaHelp.ini"); }
+        catch (Exception e) { e.printStackTrace(); }
+        openHelpWindow(helpConf);
     }
 
 }

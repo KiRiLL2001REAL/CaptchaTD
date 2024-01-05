@@ -46,7 +46,7 @@ public class ImageUtilsTest extends ApplicationTest {
     }
 
     @Test // unit
-    public void testGenerateUniqueRandomColorsNegativeCount() {
+    public void testGenUniqueRandColorsNegativeCount() {
         var randThread = ThreadLocalRandom.current();
         var colorToAvoid = ImageUtils.generateRandomColor();
         int count = -Math.abs(randThread.nextInt());
@@ -56,7 +56,7 @@ public class ImageUtilsTest extends ApplicationTest {
     }
 
     @Test // unit
-    public void testGenerateUniqueRandomColorsNormal() {
+    public void testGenUniqueRandColorsNormal() {
         var randThread = ThreadLocalRandom.current();
         var colorToAvoid = ImageUtils.generateRandomColor();
         int count = Math.abs(randThread.nextInt()) % 1024;
@@ -79,7 +79,7 @@ public class ImageUtilsTest extends ApplicationTest {
     }
 
     @Test // unit
-    public void testGenerateUniqueRandomColorsLargeCount() {
+    public void testGenUniqueRandColorsLargeCount() {
         var randThread = ThreadLocalRandom.current();
         var colorToAvoid = ImageUtils.generateRandomColor();
         int count;
