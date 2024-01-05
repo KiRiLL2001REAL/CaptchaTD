@@ -32,4 +32,4 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file Program/pom.xml -DskipTests
     - name: Run tests
-      run: mvn -B test --file Program/pom.xml 
+      run: xvfb-mvn -B test --file Program/pom.xml 
