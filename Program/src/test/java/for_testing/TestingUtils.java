@@ -3,7 +3,7 @@ package for_testing;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
-public class TestUtils {
+public class TestingUtils {
     public static int argbToHash(int argb) {
         return Integer.rotateLeft(argb, 8);
     }

@@ -12,6 +12,10 @@
           <option value="Program" />
           <option value="Program" />
           <option value="Program" />
+          <option value="Program" />
+          <option value="Program" />
+          <option value="Program" />
+          <option value="Program" />
         </list>
       </option>
       <option name="ignoredPackages">
@@ -20,10 +24,18 @@
           <option value="commons-codec:commons-codec:1.11" />
           <option value="commons-io:commons-io:2.5" />
           <option value="org.apache.maven.shared:maven-shared-utils:3.1.0" />
+          <option value="com.google.guava:guava:10.0.1" />
+          <option value="commons-io:commons-io:2.6" />
+          <option value="org.codehaus.plexus:plexus-utils:3.0.10" />
+          <option value="junit:junit:4.12" />
         </list>
       </option>
       <option name="ignoredReasons">
         <list>
+          <option value="Not exploitable" />
+          <option value="Not exploitable" />
+          <option value="Not exploitable" />
+          <option value="Not exploitable" />
           <option value="Not exploitable" />
           <option value="Not exploitable" />
           <option value="Not exploitable" />

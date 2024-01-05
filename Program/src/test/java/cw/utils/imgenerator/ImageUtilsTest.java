@@ -5,23 +5,33 @@ import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.WritableImage;
+import javafx.scene.paint.Color;
 import org.junit.Before;
 import org.junit.Test;
-import javafx.scene.paint.Color;
 import org.testfx.framework.junit.ApplicationTest;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static for_testing.TestUtils.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static for_testing.TestingUtils.*;
+import static org.junit.Assert.*;
 
 public class ImageUtilsTest extends ApplicationTest {
 
+    private static boolean setupCompleted = false;
+    private static final Object locker = new Object();
+
     @Before
     public void setUpClass() throws Exception {
-        ApplicationTest.launch(Main.class);
+        if (setupCompleted) {
+            synchronized (locker) {
+                if (setupCompleted)
+                    return;
+                ApplicationTest.launch(Main.class);
+                setupCompleted = true;
+            }
+        }
     }
 
     @Test // unit
@@ -42,7 +52,7 @@ public class ImageUtilsTest extends ApplicationTest {
     @Test // unit
     public void testGenerateRandomColor() {
         Color color = ImageUtils.generateRandomColor();
-        assertNotNull(color, "Object is null");
+        assertNotNull("Object is null", color);
     }
 
     @Test // unit
@@ -51,8 +61,8 @@ public class ImageUtilsTest extends ApplicationTest {
         var colorToAvoid = ImageUtils.generateRandomColor();
         int count = -Math.abs(randThread.nextInt());
         ArrayList<Color> colors = ImageUtils.generateUniqueRandomColors(count, colorToAvoid);
-        assertNotNull(colors, "Object is null");
-        assertTrue(colors.isEmpty(), "List of colors is not empty, meanwhile count is negative");
+        assertNotNull("Object is null", colors);
+        assertTrue("List of colors is not empty, meanwhile count is negative", colors.isEmpty());
     }
 
     @Test // unit
@@ -61,9 +71,9 @@ public class ImageUtilsTest extends ApplicationTest {
         var colorToAvoid = ImageUtils.generateRandomColor();
         int count = Math.abs(randThread.nextInt()) % 1024;
         ArrayList<Color> colors = ImageUtils.generateUniqueRandomColors(count, colorToAvoid);
-        assertNotNull(colors, "Object is null");
-        assertEquals(count, colors.size(), "Number of generated colors didn't match with passed count");
-        assertEquals(-1, colors.indexOf(colorToAvoid), "Avoided color is in resulting list");
+        assertNotNull("Object is null", colors);
+        assertEquals("Number of generated colors didn't match with passed count", count, colors.size());
+        assertEquals("Avoided color is in resulting list", -1, colors.indexOf(colorToAvoid));
 
         boolean duplicate = false;
         var hashes = new HashSet<Integer>();
@@ -75,7 +85,7 @@ public class ImageUtilsTest extends ApplicationTest {
             }
             hashes.add(hash);
         }
-        assertFalse(duplicate, "Found duplicate color");
+        assertFalse("Found duplicate color", duplicate);
     }
 
     @Test // unit
@@ -87,7 +97,11 @@ public class ImageUtilsTest extends ApplicationTest {
             count = Math.abs(randThread.nextInt());
         } while (count < 1024);
         int finalCount = count;
-        assertThrows(IllegalArgumentException.class, () -> ImageUtils.generateUniqueRandomColors(finalCount, colorToAvoid));
+
+        boolean exceptionThrown = false;
+        try { ImageUtils.generateUniqueRandomColors(finalCount, colorToAvoid); }
+        catch (IllegalArgumentException e) { exceptionThrown = true; }
+        assertTrue("Exception wasn't thrown", exceptionThrown);
     }
 
     @Test // unit
@@ -121,8 +135,8 @@ public class ImageUtilsTest extends ApplicationTest {
         interact(() -> snapshotRef.set(canvasRef.get().snapshot(new SnapshotParameters(), null)));
         int argb = snapshotRef.get().getPixelReader().getArgb(0, 0); // цвет забирается из снапшота в формате argb
 
-        assertEquals(color.hashCode(), argbToHash(argb),
-                "Check Color::hashCode() and fix argbToHash function.");
+        assertEquals("Check Color::hashCode() and fix argbToHash function.",
+                color.hashCode(), argbToHash(argb));
 
         // Зальём изображение указанным цветом, и убедимся, что заливка выполнена
 
@@ -134,8 +148,8 @@ public class ImageUtilsTest extends ApplicationTest {
         gc.fillRect(0, 0, WIDTH, HEIGHT);
         interact(() -> snapshotRef.set(canvasRef.get().snapshot(new SnapshotParameters(), null)));
 
-        assertFalse(findDifferentColor(BACKGROUND_COLOR, snapshotRef.get()),
-                "There is color, different from background");
+        assertFalse("There is color, different from background",
+                findDifferentColor(BACKGROUND_COLOR, snapshotRef.get()));
 
         // Сгенерируем случайный набор различных цветов в количестве доступных примитивов, не схожих с цветом фона.
         // Нарисуем несколько примитивов каждого цвета, и убедимся, что что-либо выводится.
@@ -164,7 +178,7 @@ public class ImageUtilsTest extends ApplicationTest {
                 foundedColors++;
         }
 
-        assertTrue(foundedColors > 0,
-                "No primitives are visible. May be it is false-positive detection?");
+        assertTrue("No primitives are visible. May be it is false-positive detection?",
+                foundedColors > 0);
     }
 }

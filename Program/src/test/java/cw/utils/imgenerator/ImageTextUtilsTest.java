@@ -12,25 +12,36 @@ import org.testfx.framework.junit.ApplicationTest;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-import static for_testing.TestUtils.findDifferentColor;
-import static for_testing.TestUtils.findThisColor;
-import static org.junit.jupiter.api.Assertions.*;
+import static for_testing.TestingUtils.findDifferentColor;
+import static for_testing.TestingUtils.findThisColor;
+import static org.junit.Assert.*;
 
 public class ImageTextUtilsTest extends ApplicationTest {
 
+    private static boolean setupCompleted = false;
+    private static final Object locker = new Object();
+
     @Before
     public void setUpClass() throws Exception {
-        ApplicationTest.launch(Main.class);
+        if (setupCompleted) {
+            synchronized (locker) {
+                if (setupCompleted)
+                    return;
+                ApplicationTest.launch(Main.class);
+                setupCompleted = true;
+            }
+        }
     }
 
     @Test // unit
     public void TestMakeSpecialTextObject() {
         var rtoRef = new AtomicReference<ImageTextUtils.RotatedTextObject>();
-        interact(() -> rtoRef.set(ImageTextUtils.makeSpecialTextObject("123", "Times New Roman", 16, 15, 30)));
+        interact(() -> rtoRef.set(ImageTextUtils.makeSpecialTextObject("123",
+                "Times New Roman", 16, 15, 30)));
 
-        assertNotNull(rtoRef, "Returned object is null");
-        assertTrue(rtoRef.get().getWidth() > 0, "Width <= 0");
-        assertTrue(rtoRef.get().getHeight() > 0, "Height <= 0");
+        assertNotNull("Returned object is null", rtoRef.get());
+        assertTrue("Width <= 0", rtoRef.get().getWidth() > 0);
+        assertTrue("Height <= 0", rtoRef.get().getHeight() > 0);
     }
 
     @Test // unit
@@ -40,7 +51,8 @@ public class ImageTextUtilsTest extends ApplicationTest {
         GraphicsContext gc;
 
         var rtoRef = new AtomicReference<ImageTextUtils.RotatedTextObject>();
-        interact(() -> rtoRef.set(ImageTextUtils.makeSpecialTextObject("123", "Times New Roman", 16, 15, 30)));
+        interact(() -> rtoRef.set(ImageTextUtils.makeSpecialTextObject("123",
+                "Times New Roman", 16, 15, 30)));
 
         double deviation = 16;
         int width = (int) (rtoRef.get().getWidth() + deviation * 2);
@@ -53,13 +65,14 @@ public class ImageTextUtilsTest extends ApplicationTest {
         gc.fillRect(0, 0, width, height);
 
         interact(() -> snapshotRef.set(canvasRef.get().snapshot(new SnapshotParameters(), null)));
-        assertFalse(findDifferentColor(Color.WHITE, snapshotRef.get()),
-                "There is color, different from WHITE");
+        assertFalse("There is color, different from WHITE",
+                findDifferentColor(Color.WHITE, snapshotRef.get()));
 
-        ImageTextUtils.drawRTO(gc.getPixelWriter(), rtoRef.get(), deviation, deviation, deviation / width, deviation / height);
-
+        ImageTextUtils.drawRTO(gc.getPixelWriter(), rtoRef.get(),
+                deviation, deviation, deviation / width, deviation / height);
         interact(() -> snapshotRef.set(canvasRef.get().snapshot(new SnapshotParameters(), null)));
-        assertTrue(findThisColor(Color.BLACK, snapshotRef.get()),
-                "Text was not rasterized");
+
+        assertTrue("Text was not rasterized",
+                findThisColor(Color.BLACK, snapshotRef.get()));
     }
 }

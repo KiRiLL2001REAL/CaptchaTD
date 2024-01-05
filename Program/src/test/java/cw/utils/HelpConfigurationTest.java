@@ -1,23 +1,22 @@
 package cw.utils;
 
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class HelpConfigurationTest {
-    private HelpConfiguration helpConf = null;
+    private static HelpConfiguration helpConf = null;
 
-    @Before
-    public void initData() {
+    @BeforeClass
+    public static void setUpClass() {
         helpConf = new HelpConfiguration(
                 "TESTtitle123",
                 new ArrayList<>(Arrays.asList("TESTstring1", "TESTstring2", "TESTstring3")),
@@ -29,19 +28,20 @@ public class HelpConfigurationTest {
 
     @Test // unit
     public void testGetTitle() {
-        assertEquals("TESTtitle123", helpConf.getTitle());
+        assertEquals("Title mismatch",
+                "TESTtitle123", helpConf.getTitle());
     }
 
     @Test // unit
     public void testGetStrings() {
-        assertEquals(helpConf.getStringsIndices().size(), helpConf.getStrings().size(),
-                "Strings and its indices arrays length mismatch");
+        assertEquals("Strings and its indices arrays length mismatch",
+                helpConf.getStringsIndices().size(), helpConf.getStrings().size());
     }
 
     @Test // unit
     public void testGetImages() {
-        assertEquals(helpConf.getImagesIndices().size(), helpConf.getImages().size(),
-                "Images paths and its indices arrays length mismatch");
+        assertEquals("Images paths and its indices arrays length mismatch",
+                helpConf.getImagesIndices().size(), helpConf.getImages().size());
     }
 
     @Test // integration (with system I/O)
@@ -64,11 +64,9 @@ public class HelpConfigurationTest {
                 element3 = /help/images/helpPuzzleCaptcha1.png
                 """;
             tempFile = File.createTempFile("CaptchaTD_" + UUID.randomUUID(), ".ini.tmp");
-            var fw = new FileWriter(tempFile);
-            var bw = new BufferedWriter(fw);
-            bw.write(content);
-            bw.close();
-            fw.close();
+            try (var writer = new OutputStreamWriter(new FileOutputStream(tempFile), StandardCharsets.UTF_8)) {
+                writer.write(content);
+            }
         } catch (IOException e) {
             e.printStackTrace();
             fail("Failed to create temporary file");
@@ -82,15 +80,15 @@ public class HelpConfigurationTest {
             fail("Failed to parse date");
         }
 
-        assertEquals("Справка: \"Captcha - пазл\"", helpConf.getTitle(),
-                "Expected title mismatch");
-        assertEquals(2, helpConf.getStrings().size(),
-                "Strings count mismatch");
-        assertEquals(helpConf.getStringsIndices().size(), helpConf.getStrings().size(),
-                "Strings and its indices arrays length mismatch");
-        assertEquals(2, helpConf.getImages().size(),
-                "Images paths count mismatch");
-        assertEquals(helpConf.getImagesIndices().size(), helpConf.getImages().size(),
-                "Images paths and its indices arrays length mismatch");
+        assertEquals("Expected title mismatch",
+                "Справка: \"Captcha - пазл\"", helpConf.getTitle());
+        assertEquals("Strings count mismatch",
+                2, helpConf.getStrings().size());
+        assertEquals("Strings and its indices arrays length mismatch",
+                helpConf.getStringsIndices().size(), helpConf.getStrings().size());
+        assertEquals("Images paths count mismatch",
+                2, helpConf.getImages().size());
+        assertEquals("Images paths and its indices arrays length mismatch",
+                helpConf.getImagesIndices().size(), helpConf.getImages().size());
     }
 }

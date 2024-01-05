@@ -13,14 +13,24 @@ import org.testfx.framework.junit.ApplicationTest;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-import static for_testing.TestUtils.argbToHash;
-import static org.junit.jupiter.api.Assertions.*;
+import static for_testing.TestingUtils.argbToHash;
+import static org.junit.Assert.assertEquals;
 
-public class TestUtilsTest extends ApplicationTest {
+public class TestingUtilsTest extends ApplicationTest {
+
+    private static boolean setupCompleted = false;
+    private static final Object locker = new Object();
 
     @Before
     public void setUpClass() throws Exception {
-        ApplicationTest.launch(Main.class);
+        if (setupCompleted) {
+            synchronized (locker) {
+                if (setupCompleted)
+                    return;
+                ApplicationTest.launch(Main.class);
+                setupCompleted = true;
+            }
+        }
     }
 
     @Test // unit (для cw.utils.imgenerator.testDrawPrimitives)
@@ -38,7 +48,6 @@ public class TestUtilsTest extends ApplicationTest {
         interact(() -> snapshotRef.set(canvas.snapshot(new SnapshotParameters(), null)));
         int argb = snapshotRef.get().getPixelReader().getArgb(0, 0); // цвет забирается из снапшота в формате argb
 
-        assertEquals(color.hashCode(), argbToHash(argb),
-                "Check Color::hashCode() and fix argbToHash function.");
+        assertEquals("Check Color::hashCode() and fix argbToHash function.", color.hashCode(), argbToHash(argb));
     }
 }
