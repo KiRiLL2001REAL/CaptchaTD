@@ -1,26 +1,15 @@
 package cw.utils;
 
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class HelpConfigurationTest {
-
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
-
     private static HelpConfiguration helpConf = null;
-
 
     @BeforeClass
     public static void setUpClass() {
@@ -53,42 +42,17 @@ public class HelpConfigurationTest {
 
     @Test // integration (with system I/O)
     public void testLoadFromFile() {
-        File tempFile = null;
-        try {
-            String content = """
-                # Конфигурационный файл капчи-паззла
-                                
-                [title]
-                name = Справка: "Captcha - пазл"
-                                
-                [content]
-                # индексы в строго возрастающей последовательности, начальный индекс = 0
-                stringsIndices = 0, 2
-                imagesIndices = 1, 3
-                element0 = Тип "капчи": поведенческая.\\n\\n\\nНеобходимо нажимая на плитки (1) добиться восстановления исходного\\nизображения.\\nNote: Каждая плитка меняется либо вертикально, либо горизонтально,\\nпри этом ротация индексов сгенерирована случайным образом.\\nИзначально все плитки перепутаны.
-                element1 = /help/images/helpPuzzleCaptcha.png
-                element2 = После восстановления изображения нажмите кнопку "Проверить", и\\nрезультат отобразится в поле (2). Ниже приведён пример решения.
-                element3 = /help/images/helpPuzzleCaptcha1.png
-                """;
-            tempFile = folder.newFile();
-            try (var writer = new OutputStreamWriter(new FileOutputStream(tempFile), StandardCharsets.UTF_8)) {
-                writer.write(content);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            fail("Failed to create temporary file");
-        }
-
         var helpConf = new HelpConfiguration();
         try {
-            helpConf.loadFromFile(tempFile.getAbsolutePath());
-        } catch (Exception e) {
+            helpConf.loadFromFile("/help/config/testHelp.ini");
+        }
+        catch (Exception e) {
             e.printStackTrace();
-            fail("Failed to parse date");
+            fail("Failed to open resource test file");
         }
 
         assertEquals("Expected title mismatch",
-                "Справка: \"Captcha - пазл\"", helpConf.getTitle());
+                "Test: \"Тест - test\"", helpConf.getTitle());
         assertEquals("Strings count mismatch",
                 2, helpConf.getStrings().size());
         assertEquals("Strings and its indices arrays length mismatch",
@@ -97,5 +61,17 @@ public class HelpConfigurationTest {
                 2, helpConf.getImages().size());
         assertEquals("Images paths and its indices arrays length mismatch",
                 helpConf.getImagesIndices().size(), helpConf.getImages().size());
+
+        assertArrayEquals("String content mismatch",
+                helpConf.strings.toArray(),
+                new String[]{
+                        "Тест \"test\": тест.\n\n\nTest тест test тест (1) test тест test.",
+                        "Test тест test тест test \"тест\", test\nтест test тест test (2). Тест test тест test."});
+
+        assertArrayEquals("Images paths content mismatch",
+                helpConf.images.toArray(),
+                new String[]{
+                        "/path/to/image/in/resource/folder/1.png",
+                        "/path/to/image/in/resource/folder/2.png"});
     }
 }
