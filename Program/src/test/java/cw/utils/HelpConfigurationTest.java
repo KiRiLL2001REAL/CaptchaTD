@@ -1,7 +1,9 @@
 package cw.utils;
 
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -13,7 +15,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 public class HelpConfigurationTest {
+
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
+
     private static HelpConfiguration helpConf = null;
+
 
     @BeforeClass
     public static void setUpClass() {
@@ -63,7 +70,7 @@ public class HelpConfigurationTest {
                 element2 = После восстановления изображения нажмите кнопку "Проверить", и\\nрезультат отобразится в поле (2). Ниже приведён пример решения.
                 element3 = /help/images/helpPuzzleCaptcha1.png
                 """;
-            tempFile = File.createTempFile("CaptchaTD_" + UUID.randomUUID(), ".ini.tmp");
+            tempFile = folder.newFile();
             try (var writer = new OutputStreamWriter(new FileOutputStream(tempFile), StandardCharsets.UTF_8)) {
                 writer.write(content);
             }
