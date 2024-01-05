@@ -46,8 +46,10 @@ public class ImageTextUtils {
      * @param maxDeviationAngle the angle within which the image will be additionally rotated.
      */
     public static RotatedTextObject makeSpecialTextObject(
-            String expr, String fontName, int fontSize, double constantAngle, double maxDeviationAngle)
-    {
+            String expr,
+            String fontName, int fontSize,
+            double constantAngle, double maxDeviationAngle
+    ) {
         final double gradToRad = Math.PI / 180d;
         Font font = new Font(fontName, fontSize);
 
@@ -148,23 +150,23 @@ public class ImageTextUtils {
      * Draw rasterized text {@link RotatedTextObject} in specified {@link PixelWriter}.
      * @param pW {@link PixelWriter} of canvas, where RTO should be drawn.
      * @param RTO {@link RotatedTextObject}.
-     * @param x start position by x-axis.
-     * @param y start position by y-axis.
+     * @param startX start position by x-axis.
+     * @param startY start position by y-axis.
      * @param maxDeviationX x-axis deviation in percent.
      * @param maxDeviationY y-axis deviation in percent.
      */
     public static void drawRTO(
-            PixelWriter pW, RotatedTextObject RTO,
-            double x, double y,
+            PixelWriter pW,
+            RotatedTextObject RTO,
+            double startX, double startY,
             double maxDeviationX, double maxDeviationY
-    ) throws IllegalArgumentException
-    {
+    ) throws IllegalArgumentException {
         if (maxDeviationX < 0 || maxDeviationX > 1 || maxDeviationY < 0 || maxDeviationY > 1)
             throw new IllegalArgumentException("Percent should be in range [0, 1].");
 
         int image_ptr = 0;
-        double globalOffsetX = x;
-        double globalOffsetY = y;
+        double globalOffsetX = startX;
+        double globalOffsetY = startY;
         for (int row = 0; row < RTO.imgInRow.size(); row++) {
             double maxImageHeight = 0;
             for (int column = 0; column < RTO.imgInRow.get(row); column++) {
@@ -188,15 +190,16 @@ public class ImageTextUtils {
                 for (int i = 0; i < image.getHeight(); i++)
                     for (int j = 0; j < image.getWidth(); j++) {
                         Color color = pr.getColor(j, i);
-                        if (!color.equals(Color.WHITE))
-                            pW.setColor((int)(globalOffsetX + j + localOffsetX), (int)(globalOffsetY + i + localOffsetY), color);
+                        if (color.equals(Color.WHITE))
+                            continue;
+                        pW.setColor((int)(globalOffsetX + j + localOffsetX), (int)(globalOffsetY + i + localOffsetY), color);
                     }
 
                 globalOffsetX += image.getWidth() + localOffsetX * 2d;
                 image_ptr++;
             }
             globalOffsetY += maxImageHeight;
-            globalOffsetX = x;
+            globalOffsetX = startX;
         }
     }
 }

@@ -9,13 +9,23 @@ import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.concurrent.ThreadLocalRandom;
+
 import static cw.utils.imgenerator.AdditionalMath.mapValue;
-import static cw.utils.imgenerator.ImageUtils.drawPrimitive;
+import static cw.utils.imgenerator.ImageUtils.*;
 
 public class CaptchaImageGenerator {
 
-    private static WritableImage randomBulgePitchEffect(Image image, double minX, double maxX, double minY, double maxY,
-                                                       double minS, double maxS, double minR, double maxR) {
+    private static WritableImage randomBulgePitchEffect(
+            Image image,
+            double minX, double maxX,
+            double minY, double maxY,
+            double minS, double maxS,
+            double minR, double maxR
+    ) {
         double rX = mapValue(Math.random(), 0, 1, minX, maxX);
         double rY = mapValue(Math.random(), 0, 1, minY, maxY);
         double rS = mapValue(Math.random(), 0, 1, minS, maxS);
@@ -23,25 +33,32 @@ public class CaptchaImageGenerator {
         return ImageUtils.bulgePitchEffect(image, rX, rY, rS, rR);
     }
 
-    public static Image generateImage(String expression, int fontSize, int width, int height) {
+    public static Image generateImage(
+            String expression,
+            int fontSize,
+            int width,
+            int height
+    ) {
+        final Color BACKGROUND_COLOR = Color.WHITE;
+        final int DRAW_PASSES = 2;
+        final int ELEMENT_COUNT_ORIGIN = 1;
+        final int ELEMENT_COUNT_BOUND = 5;
+
         Canvas canvas = new Canvas(width, height);
         GraphicsContext gContext = canvas.getGraphicsContext2D();
 
-        gContext.setFill(Color.WHITE);
+        gContext.setFill(BACKGROUND_COLOR);
         gContext.fillRect(0, 0, width, height);
 
         // draw background
-        for (int i = 0; i < 2; i++) {
-            final int n = 5;
-            drawPrimitive(width, height, gContext, ImageUtils.PrimitiveType.fillRect,        (int)(Math.random() * n) + 1);
-            drawPrimitive(width, height, gContext, ImageUtils.PrimitiveType.fillArc,         (int)(Math.random() * n) + 1);
-            drawPrimitive(width, height, gContext, ImageUtils.PrimitiveType.fillOval,        (int)(Math.random() * n) + 1);
-            drawPrimitive(width, height, gContext, ImageUtils.PrimitiveType.fillRoundRect,   (int)(Math.random() * n) + 1);
-            drawPrimitive(width, height, gContext, ImageUtils.PrimitiveType.strokeRect,      (int)(Math.random() * n) + 1);
-            drawPrimitive(width, height, gContext, ImageUtils.PrimitiveType.strokeArc,       (int)(Math.random() * n) + 1);
-            drawPrimitive(width, height, gContext, ImageUtils.PrimitiveType.strokeLine,      (int)(Math.random() * n) + 1);
-            drawPrimitive(width, height, gContext, ImageUtils.PrimitiveType.strokeOval,      (int)(Math.random() * n) + 1);
-            drawPrimitive(width, height, gContext, ImageUtils.PrimitiveType.strokeRoundRect, (int)(Math.random() * n) + 1);
+        ArrayList<PrimitiveType> primitives = new ArrayList<>(Arrays.asList(PrimitiveType.values()));
+        Collections.shuffle(primitives);
+        for (int i = 0; i < DRAW_PASSES; i++) {
+            for (var primitiveType : primitives) {
+                int count = ThreadLocalRandom.current().nextInt(ELEMENT_COUNT_ORIGIN, ELEMENT_COUNT_BOUND);
+                ArrayList<Color> colors = generateUniqueRandomColors(count, BACKGROUND_COLOR);
+                drawPrimitive(gContext, primitiveType, colors);
+            }
         }
 
         // drawing expression

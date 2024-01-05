@@ -45,7 +45,7 @@ public class TextCaptchaController extends BasicCaptchaController implements ICa
 
     @FXML
     public void checkAnswer() {
-        if (editText.getText().length() == 0) {
+        if (editText.getText().isEmpty()) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Предупреждение");
             alert.setHeaderText("Некорректный ввод данных");

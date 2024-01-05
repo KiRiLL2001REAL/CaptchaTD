@@ -7,13 +7,11 @@ import java.util.Objects;
 
 public class TextCaptchaLogic extends CaptchaLogic implements ICaptcha {
     private final Image mImage;
-    private final String mExpression;
     private final String mAnswer;
 
     public TextCaptchaLogic(String expression, String answer, int fontSize, int width, int height) {
-        mExpression = expression;
         mAnswer = answer;
-        mImage = CaptchaImageGenerator.generateImage(mExpression, fontSize, width, height);
+        mImage = CaptchaImageGenerator.generateImage(expression, fontSize, width, height);
     }
 
     public Image[] getImages() {

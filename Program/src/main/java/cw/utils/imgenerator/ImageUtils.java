@@ -7,7 +7,8 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
 
-import java.util.Random;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static cw.utils.imgenerator.AdditionalMath.mapValue;
 
@@ -19,7 +20,11 @@ public class ImageUtils {
      * @param dx offset by x-axis.
      * @param dy offset by y-axis.
      */
-    public static Color bilinearInterpolateColor(Color[] pixels, double dx, double dy) {
+    public static Color bilinearInterpolateColor(
+            Color[] pixels,
+            double dx,
+            double dy
+    ) {
         double[][] channelsOfPixel = new double[4][3];
         for (int i = 0; i < 4; i++) {
             channelsOfPixel[i][0] = pixels[i].getRed();
@@ -81,7 +86,13 @@ public class ImageUtils {
      * @param radius the distance in pixels, beyond which the effect will not be applied.
      * @return {@link WritableImage} with applied effect.
      */
-    public static WritableImage bulgePitchEffect(Image image, double cX, double cY, double strength, double radius) {
+    public static WritableImage bulgePitchEffect(
+            Image image,
+            double cX,
+            double cY,
+            double strength,
+            double radius
+    ) {
         var pr = image.getPixelReader();
 
         var width = image.getWidth();
@@ -132,35 +143,39 @@ public class ImageUtils {
 
     public enum PrimitiveType {
         none,
-        strokeRect, strokeArc, strokeLine, strokeOval, strokeRoundRect,
-        fillRect,   fillArc,               fillOval,   fillRoundRect
+        fillRect,   fillArc,               fillOval,   fillRoundRect,
+        strokeRect, strokeArc, strokeLine, strokeOval, strokeRoundRect
     }
 
-    public static void drawPrimitive(double cWidth, double cHeight, GraphicsContext gContext,
-                                     PrimitiveType primitive, int count)
-    {
+    public static void drawPrimitive(
+            final GraphicsContext gContext,
+            final PrimitiveType primitive,
+            final List<Color> colors
+    ) {
         if (primitive == PrimitiveType.none)
             return;
 
-        final double minSizeX = cWidth * 0.05d;
-        final double minSizeY = cHeight * 0.05d;
+        final double areaWidth = gContext.getCanvas().getWidth();
+        final double areaHeight = gContext.getCanvas().getHeight();
+        final double minSizeX = areaWidth * 0.05d;
+        final double minSizeY = areaHeight * 0.05d;
 
         gContext.save();
 
         double[] arg = new double[6];
-        for (int i = 0; i < count; i++) {
-            gContext.setStroke(generateRandomColor(false));
-            gContext.setFill(generateRandomColor(false));
-            gContext.setLineWidth((int)(Math.random() * cWidth * 0.02) + 1);
+        for (Color color : colors) {
+            gContext.setStroke(color);
+            gContext.setFill(color);
+            gContext.setLineWidth((int) (Math.random() * Math.max(areaWidth, areaHeight) * 0.02) + 1);
 
             arg[0] = mapValue(Math.random(), 0, 1,
-                    -cWidth * 0.1d, cWidth * 1.1d);  // x
+                    areaWidth * -0.1d, areaWidth * 1.1d);  // x
             arg[1] = mapValue(Math.random(), 0, 1,
-                    -cHeight * 0.1d, cHeight * 1.1d); // y
+                    areaHeight * -0.1d, areaHeight * 1.1d); // y
             arg[2] = mapValue(Math.random(), 0, 1,
-                    minSizeX, cWidth * 0.5d);          // w
+                    minSizeX, areaWidth * 0.5d);          // w
             arg[3] = mapValue(Math.random(), 0, 1,
-                    minSizeY, cHeight * 0.5d);         // h
+                    minSizeY, areaHeight * 0.5d);         // h
             switch (primitive) {
                 case strokeRect -> gContext.strokeRect(arg[0], arg[1], arg[2], arg[3]);
                 case fillRect -> gContext.fillRect(arg[0], arg[1], arg[2], arg[3]);
@@ -168,9 +183,9 @@ public class ImageUtils {
                 case fillOval -> gContext.fillOval(arg[0], arg[1], arg[2], arg[3]);
                 case strokeLine -> {
                     arg[2] = mapValue(Math.random(), 0, 1,
-                            -cWidth * 0.1d, cWidth * 1.1d);  // x2
+                            -areaWidth * 0.1d, areaWidth * 1.1d);  // x2
                     arg[3] = mapValue(Math.random(), 0, 1,
-                            -cHeight * 0.1d, cHeight * 1.1d); // y2
+                            -areaHeight * 0.1d, areaHeight * 1.1d); // y2
                     gContext.strokeLine(arg[0], arg[1], arg[2], arg[3]);
                 }
                 case strokeArc, fillArc -> {
@@ -183,40 +198,72 @@ public class ImageUtils {
                     a[2] = ArcType.ROUND;
                     if (primitive == PrimitiveType.strokeArc)
                         gContext.strokeArc(arg[0], arg[1], arg[2], arg[3], arg[4], arg[5], a[r]);
-                    else  gContext.fillArc(arg[0], arg[1], arg[2], arg[3], arg[4], arg[5], a[r]);
+                    else gContext.fillArc(arg[0], arg[1], arg[2], arg[3], arg[4], arg[5], a[r]);
                 }
                 case strokeRoundRect, fillRoundRect -> {
                     arg[4] = arg[5] = minSizeX * mapValue(Math.random(), 0, 1,
                             0.2, 5);
                     if (primitive == PrimitiveType.strokeRoundRect)
                         gContext.strokeRoundRect(arg[0], arg[1], arg[2], arg[3], arg[4], arg[5]);
-                    else  gContext.fillRoundRect(arg[0], arg[1], arg[2], arg[3], arg[4], arg[5]);
+                    else gContext.fillRoundRect(arg[0], arg[1], arg[2], arg[3], arg[4], arg[5]);
                 }
+                default -> {/* nope */}
             }
         }
 
         gContext.restore();
     }
 
-    private static final double MIN_COLOR_FACTOR = 0.1d;
-    private static final double MAX_COLOR_FACTOR = 0.9d;
+    private static final int MIN_COLOR_VALUE =  54;
+    private static final int MAX_COLOR_VALUE = 230;
 
-    public static Color generateRandomColor(boolean hasTransparency) {
-        Random rng = new Random();
-        int c = rng.nextInt();
-        float r = (float)mapValue(c & 255, 0, 255,
-                MIN_COLOR_FACTOR, MAX_COLOR_FACTOR);
-        float g = (float)mapValue((c >> 8) & 255, 0, 255,
-                MIN_COLOR_FACTOR, MAX_COLOR_FACTOR);
-        float b = (float)mapValue((c >> 16) & 255, 0, 255,
-                MIN_COLOR_FACTOR, MAX_COLOR_FACTOR);
-        if (hasTransparency) {
-            float opacity = (float) mapValue((c >> 24) & 255, 0, 255,
-                    0, 1);
-            return new Color(r, g, b, opacity);
+    public static Color generateRandomColor() {
+        int randVal = ThreadLocalRandom.current().nextInt();
+        int r = Math.min(MAX_COLOR_VALUE, Math.max(MIN_COLOR_VALUE, (randVal      ) & 255));
+        int g = Math.min(MAX_COLOR_VALUE, Math.max(MIN_COLOR_VALUE, (randVal >>  8) & 255));
+        int b = Math.min(MAX_COLOR_VALUE, Math.max(MIN_COLOR_VALUE, (randVal >> 16) & 255));
+        return Color.rgb(r, g, b, 1);
+    }
+
+    /***
+     * Utility method, that generates different colors.
+     * @param count required count. The value must be less than <code>2^10</code>.
+     *              <p> Non-positive value will produce an empty {@link ArrayList}<{@link Color}>.
+     * @param colorToAvoid color, that not to be generated.
+     * @return {@link ArrayList}<{@link Color}> with different values.
+     */
+    public static ArrayList<Color> generateUniqueRandomColors(
+            int count,
+            Color colorToAvoid
+    ) throws IllegalArgumentException {
+        if (count > 1024)
+            throw new IllegalArgumentException(String.format("Parameter 'count' is %d (not less than 2^10)", count));
+        count = Math.max(0, count);
+
+        ArrayList<Integer> list = new ArrayList<>(count);
+        for (int i = 0; i < count; i++)
+            list.add(i);
+        Collections.shuffle(list);
+
+        var storedHashes = new HashSet<Integer>(count + 1);
+        storedHashes.add(colorToAvoid.hashCode());
+
+        var result = new ArrayList<Color>();
+        for (int i = 0; i < count; i++) {
+            boolean unique = false;
+            Color newColor;
+            do {
+                newColor = generateRandomColor();
+                int newHash = newColor.hashCode();
+                if (!storedHashes.contains(newHash)) {
+                    storedHashes.add(newHash);
+                    unique = true;
+                }
+            } while (!unique);
+            result.add(newColor);
         }
 
-        return new Color(r, g, b, 1);
+        return result;
     }
 
     /**
