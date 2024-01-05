@@ -26,7 +26,7 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Maven clean and verify
-      run: mvn -B clean verify --file Program/pom.xml  -DskipTests
+      run: mvn -B clean verify --file Program/pom.xml -DskipTests
     - name: Build with Maven
       run: mvn -B package --file Program/pom.xml -DskipTests
     
@@ -40,7 +40,5 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
-    - name: Maven clean and verify
-      run: mvn -B clean verify --file Program/pom.xml  -DskipTests
     - name: Run tests
       run: xvfb-run mvn -B test --file Program/pom.xml
