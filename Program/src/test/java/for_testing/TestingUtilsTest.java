@@ -7,7 +7,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.testfx.framework.junit.ApplicationTest;
 
@@ -18,19 +18,9 @@ import static org.junit.Assert.assertEquals;
 
 public class TestingUtilsTest extends ApplicationTest {
 
-    private static boolean setupCompleted = false;
-    private static final Object locker = new Object();
-
-    @Before
-    public void setUpClass() throws Exception {
-        if (setupCompleted) {
-            synchronized (locker) {
-                if (setupCompleted)
-                    return;
-                ApplicationTest.launch(Main.class);
-                setupCompleted = true;
-            }
-        }
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+        ApplicationTest.launch(Main.class);
     }
 
     @Test // unit (для cw.utils.imgenerator.testDrawPrimitives)
@@ -48,6 +38,7 @@ public class TestingUtilsTest extends ApplicationTest {
         interact(() -> snapshotRef.set(canvas.snapshot(new SnapshotParameters(), null)));
         int argb = snapshotRef.get().getPixelReader().getArgb(0, 0); // цвет забирается из снапшота в формате argb
 
-        assertEquals("Check Color::hashCode() and fix argbToHash function.", color.hashCode(), argbToHash(argb));
+        assertEquals("Check Color::hashCode() and fix argbToHash function.",
+                color.hashCode(), argbToHash(argb));
     }
 }

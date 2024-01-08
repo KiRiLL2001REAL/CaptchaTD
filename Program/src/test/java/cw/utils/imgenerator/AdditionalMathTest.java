@@ -6,7 +6,7 @@ import static org.junit.Assert.assertEquals;
 
 public class AdditionalMathTest {
 
-    @Test
+    @Test // unit
     public void testMapValue() {
         double value = 1;
         double srcFrom = 0;
@@ -17,7 +17,7 @@ public class AdditionalMathTest {
         assertEquals(2.5, actual, 0.0001);
     }
 
-    @Test
+    @Test // unit
     public void testEuclideanDistance2D() {
         double[] point1 = {0, 0};
         double[] point2 = {1, 2};
@@ -25,7 +25,7 @@ public class AdditionalMathTest {
         assertEquals(Math.sqrt(5), actual, 0.0001);
     }
 
-    @Test
+    @Test // unit
     public void testEuclideanDistance3D() {
         double[] point1 = {1, 2, 3};
         double[] point2 = {0, 0, 0};

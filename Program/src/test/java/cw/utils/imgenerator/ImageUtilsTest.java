@@ -112,22 +112,6 @@ public class ImageUtilsTest extends ApplicationTest {
         GraphicsContext gc;
         final Color BACKGROUND_COLOR = ImageUtils.generateRandomColor();
 
-        // проверка правильности конвертации цвета argb в хеш (тест эквивалентности Color::hashCode() и argbToHash())
-
-        canvasRef.set(new Canvas(1, 1));
-        gc = canvasRef.get().getGraphicsContext2D();
-
-        Color color = ImageUtils.generateRandomColor();
-        gc.setFill(BACKGROUND_COLOR);
-        gc.fillRect(0, 0, 1, 1);
-        gc.setFill(color);
-        gc.fillRect(0, 0, 1, 1);
-        interact(() -> snapshotRef.set(canvasRef.get().snapshot(new SnapshotParameters(), null)));
-        int argb = snapshotRef.get().getPixelReader().getArgb(0, 0); // цвет забирается из снапшота в формате argb
-
-        assertEquals("Check Color::hashCode() and fix argbToHash function.",
-                color.hashCode(), argbToHash(argb));
-
         // Зальём изображение указанным цветом, и убедимся, что заливка выполнена
 
         final int WIDTH, HEIGHT;    WIDTH = HEIGHT = 128;
